@@ -132,7 +132,7 @@
     <div id="screen-table" class="screen">
         <div style="display:flex; gap:15px; justify-content:center; padding:10px; background:#fff; border-bottom:1px solid #eee; font-size:0.8rem;">
             <label><input type="checkbox" id="check-group" onchange="updateTableStyle()"> 系統色</label>
-            <label><input type="checkbox" id="check-status" onchange="updateTableStyle()"> 状態</label>
+            <label><input type="checkbox" id="check-status" onchange="updateTableStyle()"> 常温での状態</label>
             <label><input type="checkbox" id="check-radio" onchange="updateTableStyle()"> 放射性</label>
         </div>
         <div class="table-container">
@@ -391,9 +391,9 @@
             <div style="font-size:4.5rem; font-weight:bold;">${el.s}</div>
             <div style="font-size:1.8rem;">${el.m}</div>
             <div style="margin-top:15px; font-size:0.9rem; text-align:left; background:#f2f2f7; padding:15px; border-radius:12px;">
-                <div>系統: ${getGroupName(el)}</div>
-                <div>常温での状態: ${getStateName(el.n)}</div>
-                <div>原子量: ${el.w}</div>
+                <div>🧬 系統: ${getGroupName(el)}</div>
+                <div>🌡️ 常温での状態: ${getStateName(el.n)}</div>
+                <div>⚖️ 原子量: ${el.w}</div>
             </div>
         `;
         document.getElementById('modal-overlay').style.display = 'flex';
