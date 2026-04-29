@@ -170,7 +170,7 @@
 
     <div id="selector-overlay">
         <div style="color:white; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-size:0.9rem;">なぞって選択</span>
+            <span style="font-size:0.9rem;">出題元素個別選択</span>
             <button class="btn" onclick="closeSelector()">完了</button>
         </div>
         <div id="selector-container">
@@ -280,8 +280,8 @@
             legendArea.style.display = 'flex';
             if (isGroup) {
                 const groups = [
-                    {cls:"alkali-metal", txt:"アルカリ金属"}, {cls:"alkaline-earth", txt:"アル土"}, 
-                    {cls:"transition-metal", txt:"遷移金属"}, {cls:"basic-metal", txt:"事後遷移"}, 
+                    {cls:"alkali-metal", txt:"アルカリ金属"}, {cls:"alkaline-earth", txt:"アルカリ土類金属"}, 
+                    {cls:"transition-metal", txt:"遷移金属"}, {cls:"basic-metal", txt:"事後遷移金属"}, 
                     {cls:"metalloid", txt:"半金属"}, {cls:"nonmetal", txt:"非金属"}, 
                     {cls:"halogen", txt:"ハロゲン"}, {cls:"noble-gas", txt:"希ガス"}
                 ];
@@ -391,9 +391,9 @@
             <div style="font-size:4.5rem; font-weight:bold;">${el.s}</div>
             <div style="font-size:1.8rem;">${el.m}</div>
             <div style="margin-top:15px; font-size:0.9rem; text-align:left; background:#f2f2f7; padding:15px; border-radius:12px;">
-                <div>🧬 系統: ${getGroupName(el)}</div>
-                <div>🌡️ 状態: ${getStateName(el.n)}</div>
-                <div>⚖️ 原子量: ${el.w}</div>
+                <div>系統: ${getGroupName(el)}</div>
+                <div>常温での状態: ${getStateName(el.n)}</div>
+                <div>原子量: ${el.w}</div>
             </div>
         `;
         document.getElementById('modal-overlay').style.display = 'flex';
