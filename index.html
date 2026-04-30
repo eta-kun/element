@@ -38,7 +38,6 @@
         .active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 周期表グリッド */
         .table-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .table-grid { 
             display: grid; grid-template-columns: 20px repeat(18, 1fr); 
@@ -52,7 +51,6 @@
         .guide-label { display: flex; justify-content: center; align-items: center; font-size: 0.5rem; color: var(--guide-text); pointer-events: none; }
         .spacer { border: none; background: transparent; pointer-events: none; }
 
-        /* 色分け設定 */
         .alkali-metal { background: #ff6666 !important; }
         .alkaline-earth { background: #ffdead !important; }
         .transition-metal { background: #add8e6 !important; }
@@ -69,19 +67,16 @@
         .show-status .state-liquid b { color: #007aff !important; }
         .show-radio .is-radio::after { content: "☢"; position: absolute; bottom: 0; left: 1px; color: #ff3b30; font-size: 0.5rem; }
 
-        /* セレクター画面 */
         #selector-grid .cell { background: #fff !important; color: #1d1d1f !important; border: 1px solid #d2d2d7; }
         #selector-grid .cell b { color: inherit !important; }
         #selector-grid .cell::after { content: none !important; }
         #selector-grid .cell.selected { background: var(--accent) !important; color: #fff !important; border-color: var(--accent); }
         #selector-grid .cell.selected span { color: #fff !important; }
 
-        /* 凡例エリア */
         #legend-area { display: none; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 10px; background: #fff; border-top: 1px solid var(--border); font-size: 0.7rem; flex-shrink: 0; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-box { width: 14px; height: 14px; border: 1px solid #ccc; border-radius: 2px; }
 
-        /* ホーム画面のボタンレイアウト */
         .home-menu { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
         .btn-large { background: var(--accent); color: white; border: none; padding: 20px; border-radius: 16px; cursor: pointer; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,113,227,0.2); }
         .btn-large:active { transform: scale(0.98); }
@@ -96,6 +91,12 @@
         .modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px 15px; border-radius: 20px; position: relative; text-align: center; }
         .modal-nav { position: absolute; top: 0; width: 50px; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 1.5rem; cursor: pointer; z-index: 10; opacity: 0.5; transition: opacity 0.2s; }
         .modal-nav:active { color: var(--accent); opacity: 1; }
+
+        .search-btn { position: absolute; right: 15px; bottom: 15px; background: #f2f2f7; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 50; }
+        .search-btn:active { transform: scale(0.9); background: #e5e5ea; }
+
+        .quick-link-btn { background: #f2f2f7; border: 1px solid #ddd; border-radius: 6px; padding: 2px 8px; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; }
+        .quick-link-btn:active { background: #e5e5ea; }
 
         .btn { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
         .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer; }
@@ -130,10 +131,16 @@
     </div>
 
     <div id="screen-table" class="screen">
-        <div style="display:flex; gap:15px; justify-content:center; padding:10px; background:#fff; border-bottom:1px solid #eee; font-size:0.8rem;">
-            <label><input type="checkbox" id="check-group" onchange="updateTableStyle()"> 系統色</label>
-            <label><input type="checkbox" id="check-status" onchange="updateTableStyle()"> 常温での状態</label>
-            <label><input type="checkbox" id="check-radio" onchange="updateTableStyle()"> 放射性</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#fff; border-bottom:1px solid #eee;">
+            <div style="display:flex; gap:15px; font-size:0.8rem;">
+                <label><input type="checkbox" id="check-group" onchange="updateTableStyle()"> 系統色</label>
+                <label><input type="checkbox" id="check-status" onchange="updateTableStyle()"> 常温の状態</label>
+                <label><input type="checkbox" id="check-radio" onchange="updateTableStyle()"> 放射性</label>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <a href="https://artsexperiments.withgoogle.com/periodic-table/?exp=true&lang=ja" target="_blank" class="quick-link-btn" title="周期表：探検">🔍</a>
+                <a href="https://www.youtube.com/watch?v=hc08LP69lVM" target="_blank" class="quick-link-btn" title="元素動画">🎬</a>
+            </div>
         </div>
         <div class="table-container">
             <div id="table-grid" class="table-grid"></div>
@@ -146,7 +153,6 @@
             <h3 style="margin-top:0;">クイズ設定</h3>
             <div id="quiz-range-text" class="range-display">1〜20</div>
             <button class="btn-outline" style="margin-bottom:20px;" onclick="openSelector()">個別選択 / 範囲変更</button>
-            
             <div style="text-align:left; display:inline-block; width:100%; border-top:1px solid #eee; padding-top:15px;">
                 <div style="font-size:0.75rem; color:#888; margin-bottom:10px;">出題モード:</div>
                 <label style="display:block; margin-bottom:10px;"><input type="radio" name="quiz-mode" value="s-to-m" checked> 記号 ➔ 名称</label>
@@ -187,6 +193,7 @@
             <div class="modal-nav" style="left:0;" onclick="moveElement(-1)">◀</div>
             <div class="modal-nav" style="right:0;" onclick="moveElement(1)">▶</div>
             <div id="modal-body"></div>
+            <button class="search-btn" onclick="event.stopPropagation(); searchElement()">🔍</button>
         </div>
     </div>
 </div>
@@ -196,7 +203,6 @@
     const d2 = [["Pm","プロメチウム","Promethium",145,9,8],["Sm","サマリウム","Samarium",150.36,9,9],["Eu","ユウロピウム","Europium",151.96,9,10],["Gd","ガドリニウム","Gadolinium",157.25,9,11],["Tb","テルビウム","Terbium",158.93,9,12],["Dy","ジスプロシウム","Dysprosium",162.50,9,13],["Ho","ホルミウム","Hoｌmium",164.93,9,14],["Er","エルビウム","Erbium",167.26,9,15],["Tm","ツリウム","Thulium",168.93,9,16],["Yb","イッテルビウム","Ytterbium",173.05,9,17],["Lu","ルテチウム","Lutetium",174.97,9,18],["Hf","ハフニウム","Hafnium",178.49,6,4],["Ta","タンタル","Tantalum",180.95,6,5],["W","タングステン","Tungsten",183.84,6,6],["Re","レニウム","Rhenium",186.21,6,7],["Os","オスミウム","Osmium",190.23,6,8],["Ir","イリジウム","Iridium",192.22,6,9],["Pt","白金","Platinum",195.08,6,10],["Au","金","Gold",196.97,6,11],["Hg","水銀","Mercury",200.59,6,12],["Tl","タリウム","Thallium",204.38,6,13],["Pb","鉛","Lead",207.2,6,14],["Bi","ビスマス","Bismuth",208.98,6,15],["Po","ポロニウム","Polonium",209,6,16],["At","アスタチン","Astatine",210,6,17],["Rn","ラドン","Radon",222,6,18],["Fr","フランシウム","Francium",223,7,1],["Ra","ラジウム","Radium",226,7,2],["Ac","アクチニウム","Actinium",227,10,4],["Th","トリウム","Thorium",232.04,10,5],["Pa","プロトアクチニウム","Protactinium",231.04,10,6],["U","ウラン","Uranium",238.03,10,7],["Np","ネプツニウム","Neptunium",237,10,8],["Pu","プルトニウム","Plutonium",244,10,9],["Am","アメリシウム","Americium",243,10,10],["Cm","キュリウム","Curium",247,10,11],["Bk","バークリウム","Berkelium",247,10,12],["Cf","カリホルニウム","Californium",251,10,13],["Es","アインスタイニウム","Einsteinium",252,10,14],["Fm","フェルミウム","Fermium",257,10,15],["Md","メンデレビウム","Mendelevium",258,10,16],["No","ノーベリウム","Nobelium",259,10,17],["Lr","ローレンシウム","Lawrencium",262,10,18],["Rf","ラザホージウム","Rutherfordium",267,7,4],["Db","ドブニウム","Dubnium",268,7,5],["Sg","シーボーギウム","Seaborgium",269,7,6],["Bh","ボーリウム","Bohrium",270,7,7],["Hs","ハッシウム","Hassium",269,7,8],["Mt","マイトネリウム","Meitnerium",278,7,9],["Ds","ダームスタチウム","Darmstadtium",281,7,10],["Rg","レントゲニウム","Roentgenium",282,7,11],["Cn","コペルニシウム","Copernicium",285,7,12],["Nh","ニホニウム","Nihonium",286,7,13],["Fl","フレロビウム","Flerovium",289,7,14],["Mc","モスコビウム","Moscovium",290,7,15],["Lv","リバモリウム","Livermorium",293,7,16],["Ts","テネシン","Tennessine",294,7,17],["Og","オガネソン","Oganesson",294,7,18]];
     const elements = [...d1, ...d2].map((d, i) => ({ n: i+1, s: d[0], m: d[1], e: d[2], w: d[3], p: d[4], g: d[5] }));
 
-    // 初期設定：1〜20番
     let selectedNumbers = new Set(Array.from({length: 20}, (_, i) => i + 1));
     let quizPool = [], qIdx = 0, qRev = false, currentEl = null;
     let isDragging = false, dragMode = true;
@@ -322,17 +328,6 @@
         document.getElementById('quiz-range-text').innerText = res.join(', ');
     }
 
-    document.addEventListener('touchmove', (e) => {
-        if(isDragging) {
-            const touch = e.touches[0];
-            const target = document.elementFromPoint(touch.clientX, touch.clientY);
-            if(target && target.closest('.sel-cell')) toggleElement(target.closest('.sel-cell').dataset.n, dragMode);
-            e.preventDefault();
-        }
-    }, {passive: false});
-    document.addEventListener('mouseup', () => isDragging = false);
-    document.addEventListener('touchend', () => isDragging = false);
-
     function startQuiz() {
         quizPool = elements.filter(e => selectedNumbers.has(e.n));
         if(!quizPool.length) return alert("元素を選択してください");
@@ -362,28 +357,6 @@
     }
     function prevQuestion() { if(qIdx > 0) { qIdx--; nextQuestion(); } else { showScreen('screen-setup'); } }
 
-    document.getElementById('quiz-gesture-layer').onclick = (e) => { if(e.target.tagName !== 'BUTTON') handleMainAction(); };
-    document.getElementById('btn-main').onclick = handleMainAction;
-
-    let qStartX = 0;
-    document.getElementById('screen-quiz').addEventListener('touchstart', (e) => { qStartX = e.changedTouches[0].screenX; }, {passive: true});
-    document.getElementById('screen-quiz').addEventListener('touchend', (e) => {
-        const diff = e.changedTouches[0].screenX - qStartX;
-        if(Math.abs(diff) > 60) { if(diff < 0) handleMainAction(); else prevQuestion(); }
-    }, {passive: true});
-
-    window.addEventListener('keydown', (e) => {
-        if(document.getElementById('screen-quiz').classList.contains('active')) {
-            if(e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); handleMainAction(); }
-            if(e.key === 'ArrowLeft') { e.preventDefault(); prevQuestion(); }
-        }
-        if(document.getElementById('modal-overlay').style.display === 'flex') {
-            if(e.key === 'ArrowRight') moveElement(1);
-            if(e.key === 'ArrowLeft') moveElement(-1);
-            if(e.key === 'Escape') closeModal();
-        }
-    });
-
     function showDetail(el) {
         currentEl = el;
         document.getElementById('modal-body').innerHTML = `
@@ -398,6 +371,14 @@
         `;
         document.getElementById('modal-overlay').style.display = 'flex';
     }
+    
+    function searchElement() {
+        if (currentEl) {
+            const query = `${currentEl.m}+元素`;
+            window.open(`https://www.google.com/search?q=${query}`, '_blank');
+        }
+    }
+
     function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
     function moveElement(dir) { if(currentEl) { const next = elements.find(e=>e.n===currentEl.n+dir); if(next) showDetail(next); } }
 
