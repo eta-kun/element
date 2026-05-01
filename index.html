@@ -350,20 +350,21 @@
         qIdx = 0; showScreen('screen-quiz'); nextQuestion();
     }
     function nextQuestion() {
-        qRev = false; const el = quizPool[qIdx];
-        const mode = document.querySelector('input[name="quiz-mode"]:checked').value;
-        const qText = mode === "s-to-m" ? el.s : el.m;
-        const aText = mode === "s-to-m" ? el.m : el.s;
-        document.getElementById('btn-main').innerText = "答えを表示";
-        document.getElementById('q-content').innerHTML = `
-            <div style="color:#888; font-size:0.9rem;">Q ${qIdx+1} / ${quizPool.length}</div>
-            <div style="font-size:5rem; font-weight:bold; margin:20px 0;">${qText}</div>
-            <div id="q-ans" style="visibility:hidden;">
-                <div style="font-size:2.8rem; font-weight:bold;">${aText}</div>
-                <div style="font-size:1.3rem; color:var(--accent); margin-top:5px;">原子番号: ${el.n}</div>
-            </div>
-        `;
-    }
+    qRev = false; const el = quizPool[qIdx];
+    const mode = document.querySelector('input[name="quiz-mode"]:checked').value;
+    const qText = mode === "s-to-m" ? el.s : el.m;
+    const aText = mode === "s-to-m" ? el.m : el.s;
+    document.getElementById('btn-main').innerText = "答えを表示";
+    document.getElementById('q-content').innerHTML = `
+        <div style="color:#888; font-size:0.9rem;">Q ${qIdx+1} / ${quizPool.length}</div>
+        <div style="font-size:5rem; font-weight:bold; margin:20px 0;">${qText}</div>
+        <div id="q-ans" style="visibility:hidden;">
+            <div style="font-size:2.8rem; font-weight:bold;">${aText}</div>
+            <div style="font-size:1.2rem; color:#666; margin-bottom:10px;">${el.e}</div>
+            <div style="font-size:1.3rem; color:var(--accent); margin-top:5px;">原子番号: ${el.n}</div>
+        </div>
+    `;
+}
 
     function handleMainAction() {
         if(!qRev) { document.getElementById('q-ans').style.visibility = 'visible'; document.getElementById('btn-main').innerText = "次へ"; qRev = true; }
@@ -394,19 +395,21 @@
     });
 
     function showDetail(el) {
-        currentEl = el;
-        document.getElementById('modal-body').innerHTML = `
-            <div style="font-size:0.8rem; color:#888;">No. ${el.n}</div>
-            <div style="font-size:4.5rem; font-weight:bold;">${el.s}</div>
-            <div style="font-size:1.8rem;">${el.m}</div>
-            <div style="margin-top:15px; font-size:0.9rem; text-align:left; background:#f2f2f7; padding:15px; border-radius:12px;">
-                <div>🧬 系統: ${getGroupName(el)}</div>
-                <div>🌡️ 常温での状態: ${getStateName(el.n)}</div>
-                <div>⚖️ 原子量: ${el.w}</div>
-            </div>
-        `;
-        document.getElementById('modal-overlay').style.display = 'flex';
-    }
+    currentEl = el;
+    document.getElementById('modal-body').innerHTML = `
+        <div style="font-size:0.8rem; color:#888;">No. ${el.n}</div>
+        <div style="font-size:4.5rem; font-weight:bold; line-height:1;">${el.s}</div>
+        <div style="font-size:1.8rem; font-weight:bold;">${el.m}</div>
+        <div style="font-size:1.1rem; color:#666; margin-bottom:10px;">${el.e}</div>
+        
+        <div style="margin-top:15px; font-size:0.9rem; text-align:left; background:#f2f2f7; padding:15px; border-radius:12px;">
+            <div>🧬 系統: ${getGroupName(el)}</div>
+            <div>🌡️ 常温での状態: ${getStateName(el.n)}</div>
+            <div>⚖️ 原子量: ${el.w}</div>
+        </div>
+    `;
+    document.getElementById('modal-overlay').style.display = 'flex';
+}
     
     function searchElement() {
         if (currentEl) {
