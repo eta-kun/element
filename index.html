@@ -1,388 +1,424 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Element Master</title>
-    <style>
-        :root {
-            --bg-color: #f5f5f7;
-            --card-bg: #ffffff;
-            --text-main: #1d1d1f;
-            --accent: #0071e3;
-            --border: #d2d2d7;
-            --guide-text: #cbcbcb;
-        }
-        * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; box-sizing: border-box; }
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%;
-            overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg-color); color: var(--text-main); 
-            touch-action: manipulation;
-        }
-        #app { width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; }
-        
-        header { height: 50px; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); z-index: 100; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-        .menu-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text-main); padding: 5px; }
-        .fullscreen-btn { background: #eee; border: none; border-radius: 6px; padding: 5px 10px; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Element Master</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --card-bg: #ffffff;
+            --text-main: #1d1d1f;
+            --accent: #0071e3;
+            --border: #d2d2d7;
+            --guide-text: #cbcbcb;
+        }
+        * { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; box-sizing: border-box; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg-color); color: var(--text-main); 
+            touch-action: manipulation;
+        }
+        #app { width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; }
+        
+        header { height: 50px; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); z-index: 100; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .menu-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text-main); padding: 5px; }
+        .fullscreen-btn { background: #eee; border: none; border-radius: 6px; padding: 5px 10px; font-size: 0.75rem; cursor: pointer; font-weight: 600; }
 
-        #side-menu {
-            position: fixed; top: 0; left: -280px; width: 260px; height: 100%; 
-            background: var(--card-bg); box-shadow: 5px 0 25px rgba(0,0,0,0.1); 
-            z-index: 200; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px;
-        }
-        #side-menu.open { left: 0; }
-        .menu-item { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; cursor: pointer; }
+        #side-menu {
+            position: fixed; top: 0; left: -280px; width: 260px; height: 100%; 
+            background: var(--card-bg); box-shadow: 5px 0 25px rgba(0,0,0,0.1); 
+            z-index: 200; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px;
+        }
+        #side-menu.open { left: 0; }
+        .menu-item { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; cursor: pointer; }
 
-        .screen { display: none; width: 100%; height: calc(100% - 50px); position: relative; }
-        .active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .screen { display: none; width: 100%; height: calc(100% - 50px); position: relative; }
+        .active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .table-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .table-grid { 
-            display: grid; grid-template-columns: 20px repeat(18, 1fr); 
-            grid-template-rows: 15px repeat(7, 1fr) 5px repeat(2, 1fr); 
-            gap: 1px; width: 100%; min-width: 700px; max-width: 1400px; margin: 0 auto; height: 95%;
-        }
+        /* 周期表グリッド */
+        .table-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-grid { 
+            display: grid; grid-template-columns: 20px repeat(18, 1fr); 
+            grid-template-rows: 15px repeat(7, 1fr) 5px repeat(2, 1fr); 
+            gap: 1px; width: 100%; min-width: 700px; max-width: 1400px; margin: 0 auto; height: 95%;
+        }
 
-        .cell { border: 1px solid #e8e8ed; border-radius: 2px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; cursor: pointer; position: relative; color: #1d1d1f !important; font-size: 0.6rem; }
-        .cell span { font-size: 0.5rem; color: #3a3a3c; position: absolute; top: 0; right: 1px; }
-        .cell b { font-size: 0.9rem; font-weight: 700; }
-        .guide-label { display: flex; justify-content: center; align-items: center; font-size: 0.5rem; color: var(--guide-text); pointer-events: none; }
-        .spacer { border: none; background: transparent; pointer-events: none; }
+        .cell { border: 1px solid #e8e8ed; border-radius: 2px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fff; cursor: pointer; position: relative; color: #1d1d1f !important; font-size: 0.6rem; }
+        .cell span { font-size: 0.5rem; color: #3a3a3c; position: absolute; top: 0; right: 1px; }
+        .cell b { font-size: 0.9rem; font-weight: 700; }
+        .guide-label { display: flex; justify-content: center; align-items: center; font-size: 0.5rem; color: var(--guide-text); pointer-events: none; }
+        .spacer { border: none; background: transparent; pointer-events: none; }
 
-        .alkali-metal { background: #ff6666 !important; }
-        .alkaline-earth { background: #ffdead !important; }
-        .transition-metal { background: #add8e6 !important; }
-        .basic-metal { background: #98fb98 !important; }
-        .metalloid { background: #ccc0a0 !important; }
-        .nonmetal { background: #ffff99 !important; }
-        .halogen { background: #ce9aff !important; }
-        .noble-gas { background: #ffb6c1 !important; }
-        .lanthanoid { background: #ffccff !important; }
-        .actinoid { background: #ff99cc !important; }
+        /* 色分け設定 */
+        .alkali-metal { background: #ff6666 !important; }
+        .alkaline-earth { background: #ffdead !important; }
+        .transition-metal { background: #add8e6 !important; }
+        .basic-metal { background: #98fb98 !important; }
+        .metalloid { background: #ccc0a0 !important; }
+        .nonmetal { background: #ffff99 !important; }
+        .halogen { background: #ce9aff !important; }
+        .noble-gas { background: #ffb6c1 !important; }
+        .lanthanoid { background: #ffccff !important; }
+        .actinoid { background: #ff99cc !important; }
 
-        #table-grid:not(.color-mode-group) .cell { background: #fff !important; }
-        .show-status .state-gas b { color: #ff3b30 !important; }
-        .show-status .state-liquid b { color: #007aff !important; }
-        .show-radio .is-radio::after { content: "☢"; position: absolute; bottom: 0; left: 1px; color: #ff3b30; font-size: 0.5rem; }
+        #table-grid:not(.color-mode-group) .cell { background: #fff !important; }
+        .show-status .state-gas b { color: #ff3b30 !important; }
+        .show-status .state-liquid b { color: #007aff !important; }
+        .show-radio .is-radio::after { content: "☢"; position: absolute; bottom: 0; left: 1px; color: #ff3b30; font-size: 0.5rem; }
 
-        #selector-grid .cell { background: #fff !important; color: #1d1d1f !important; border: 1px solid #d2d2d7; }
-        #selector-grid .cell b { color: inherit !important; }
-        #selector-grid .cell::after { content: none !important; }
-        #selector-grid .cell.selected { background: var(--accent) !important; color: #fff !important; border-color: var(--accent); }
-        #selector-grid .cell.selected span { color: #fff !important; }
+        /* セレクター画面 */
+        #selector-grid .cell { background: #fff !important; color: #1d1d1f !important; border: 1px solid #d2d2d7; }
+        #selector-grid .cell b { color: inherit !important; }
+        #selector-grid .cell::after { content: none !important; }
+        #selector-grid .cell.selected { background: var(--accent) !important; color: #fff !important; border-color: var(--accent); }
+        #selector-grid .cell.selected span { color: #fff !important; }
 
-        #legend-area { display: none; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 10px; background: #fff; border-top: 1px solid var(--border); font-size: 0.7rem; flex-shrink: 0; }
-        .legend-item { display: flex; align-items: center; gap: 4px; }
-        .legend-box { width: 14px; height: 14px; border: 1px solid #ccc; border-radius: 2px; }
+        /* 凡例エリア */
+        #legend-area { display: none; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 10px; background: #fff; border-top: 1px solid var(--border); font-size: 0.7rem; flex-shrink: 0; }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-box { width: 14px; height: 14px; border: 1px solid #ccc; border-radius: 2px; }
 
-        .home-menu { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
-        .btn-large { background: var(--accent); color: white; border: none; padding: 20px; border-radius: 16px; cursor: pointer; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,113,227,0.2); }
-        .btn-large:active { transform: scale(0.98); }
+        /* ホーム画面のボタンレイアウト */
+        .home-menu { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
+        .btn-large { background: var(--accent); color: white; border: none; padding: 20px; border-radius: 16px; cursor: pointer; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,113,227,0.2); }
+        .btn-large:active { transform: scale(0.98); }
 
-        .setup-card { background:#fff; padding:25px; border-radius:20px; text-align:center; width: 90%; max-width:400px; border:1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .range-display { font-size: 0.85rem; background: #f2f2f7; padding: 12px; border-radius: 12px; margin-bottom: 15px; word-break: break-all; max-height: 80px; overflow-y: auto; color: #555; }
-        #quiz-gesture-layer { flex-grow:1; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; width:100%; height:100%; }
+        .setup-card { background:#fff; padding:25px; border-radius:20px; text-align:center; width: 90%; max-width:400px; border:1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .range-display { font-size: 0.85rem; background: #f2f2f7; padding: 12px; border-radius: 12px; margin-bottom: 15px; word-break: break-all; max-height: 80px; overflow-y: auto; color: #555; }
+        #quiz-gesture-layer { flex-grow:1; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; width:100%; height:100%; }
 
-        #selector-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:none; flex-direction:column; padding: 15px; backdrop-filter: blur(10px); }
-        #selector-container { background:#fff; border-radius:15px; overflow:auto; padding:10px; flex-grow:1; display: flex; align-items: center; }
-        #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
-        .modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px 15px; border-radius: 20px; position: relative; text-align: center; }
-        .modal-nav { position: absolute; top: 0; width: 50px; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 1.5rem; cursor: pointer; z-index: 10; opacity: 0.5; transition: opacity 0.2s; }
-        .modal-nav:active { color: var(--accent); opacity: 1; }
+        #selector-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:none; flex-direction:column; padding: 15px; backdrop-filter: blur(10px); }
+        #selector-container { background:#fff; border-radius:15px; overflow:auto; padding:10px; flex-grow:1; display: flex; align-items: center; }
+        #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px 15px; border-radius: 20px; position: relative; text-align: center; }
+        .modal-nav { position: absolute; top: 0; width: 50px; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 1.5rem; cursor: pointer; z-index: 10; opacity: 0.5; transition: opacity 0.2s; }
+        .modal-nav:active { color: var(--accent); opacity: 1; }
 
-        .search-btn { position: absolute; right: 15px; bottom: 15px; background: #f2f2f7; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 50; }
-        .search-btn:active { transform: scale(0.9); background: #e5e5ea; }
+        /* 虫眼鏡ボタン用スタイル (修正) */
+        .search-btn { position: absolute; right: 15px; bottom: 15px; background: #f2f2f7; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 50; }
+        .search-btn:active { transform: scale(0.9); background: #e5e5ea; }
 
-        .quick-link-btn { background: #f2f2f7; border: 1px solid #ddd; border-radius: 6px; padding: 2px 8px; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; }
-        .quick-link-btn:active { background: #e5e5ea; }
-
-        .btn { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
-        .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer; }
-    </style>
+        .btn { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+        .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer; }
+    </style>
 </head>
 <body>
 
 <div id="app">
-    <header>
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <div style="font-weight: 700;">Element MASTER</div>
-        <button class="fullscreen-btn" onclick="toggleFullscreen()">全画面</button>
-    </header>
+    <header>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div style="font-weight: 700;">Element MASTER</div>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()">全画面</button>
+    </header>
 
-    <div id="side-menu">
-        <div style="text-align:right; cursor:pointer; padding-bottom:20px; font-size:1.5rem;" onclick="toggleMenu()">✕</div>
-        <div class="menu-item" onclick="showScreen('screen-home')">🏠 ホーム</div>
-        <div class="menu-item" onclick="showScreen('screen-table')">🧬 周期表</div>
-        <div class="menu-item" onclick="showScreen('screen-setup')">📝 クイズ設定</div>
-    </div>
+    <div id="side-menu">
+        <div style="text-align:right; cursor:pointer; padding-bottom:20px; font-size:1.5rem;" onclick="toggleMenu()">✕</div>
+        <div class="menu-item" onclick="showScreen('screen-home')">🏠 ホーム</div>
+        <div class="menu-item" onclick="showScreen('screen-table')">🧬 周期表</div>
+        <div class="menu-item" onclick="showScreen('screen-setup')">📝 クイズ設定</div>
+    </div>
 
-    <div id="screen-home" class="screen active" style="justify-content: center; align-items: center;">
-        <h1 style="font-size: 2.2rem; margin-bottom: 40px; font-weight: 800;">Element Master</h1>
-        <div class="home-menu">
-            <button class="btn-large" onclick="showScreen('screen-table')">
-                <span>🧬</span> 周期表を見る
-            </button>
-            <button class="btn-large" onclick="showScreen('screen-setup')">
-                <span>📝</span> クイズに挑戦
-            </button>
-        </div>
-    </div>
+    <div id="screen-home" class="screen active" style="justify-content: center; align-items: center;">
+        <h1 style="font-size: 2.2rem; margin-bottom: 40px; font-weight: 800;">Element Master</h1>
+        <div class="home-menu">
+            <button class="btn-large" onclick="showScreen('screen-table')">
+                <span>🧬</span> 周期表を見る
+            </button>
+            <button class="btn-large" onclick="showScreen('screen-setup')">
+                <span>📝</span> クイズに挑戦
+            </button>
+        </div>
+    </div>
 
-    <div id="screen-table" class="screen">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#fff; border-bottom:1px solid #eee;">
-            <div style="display:flex; gap:15px; font-size:0.8rem;">
-                <label><input type="checkbox" id="check-group" onchange="updateTableStyle()"> 系統色</label>
-                <label><input type="checkbox" id="check-status" onchange="updateTableStyle()"> 常温の状態</label>
-                <label><input type="checkbox" id="check-radio" onchange="updateTableStyle()"> 放射性</label>
-            </div>
-            <div style="display:flex; gap:8px;">
-                <a href="https://artsexperiments.withgoogle.com/periodic-table/?exp=true&lang=ja" target="_blank" class="quick-link-btn" title="周期表：探検">🔍</a>
-                <a href="https://www.youtube.com/watch?v=hc08LP69lVM" target="_blank" class="quick-link-btn" title="元素動画">🎬</a>
-            </div>
-        </div>
-        <div class="table-container">
-            <div id="table-grid" class="table-grid"></div>
-        </div>
-        <div id="legend-area"></div>
-    </div>
+    <div id="screen-table" class="screen">
+    <div style="display:flex; gap:15px; justify-content:center; align-items:center; padding:10px; background:#fff; border-bottom:1px solid #eee; font-size:0.8rem;">
+        <label><input type="checkbox" id="check-group" onchange="updateTableStyle()"> 系統色</label>
+        <label><input type="checkbox" id="check-status" onchange="updateTableStyle()"> 常温での状態</label>
+        <label><input type="checkbox" id="check-radio" onchange="updateTableStyle()"> 放射性</label>
+        
+        <span style="color: #ddd;">|</span>
+        <a href="https://artsexperiments.withgoogle.com/periodic-table/?exp=true&lang=ja" target="_blank" style="text-decoration: none; font-size: 1rem;">🔍</a>
+        <a href="https://www.youtube.com/watch?v=hc08LP69lVM" target="_blank" style="text-decoration: none; font-size: 1rem;">▶️</a>
+    </div>
+    
+    <div class="table-container">
+        <div id="table-grid" class="table-grid"></div>
+    </div>
+    <div id="legend-area"></div>
+</div>
 
-    <div id="screen-setup" class="screen" style="justify-content: center; align-items: center;">
-        <div class="setup-card">
-            <h3 style="margin-top:0;">クイズ設定</h3>
-            <div id="quiz-range-text" class="range-display">1〜20</div>
-            <button class="btn-outline" style="margin-bottom:20px;" onclick="openSelector()">個別選択 / 範囲変更</button>
-            <div style="text-align:left; display:inline-block; width:100%; border-top:1px solid #eee; padding-top:15px;">
-                <div style="font-size:0.75rem; color:#888; margin-bottom:10px;">出題モード:</div>
-                <label style="display:block; margin-bottom:10px;"><input type="radio" name="quiz-mode" value="s-to-m" checked> 記号 ➔ 名称</label>
-                <label style="display:block; margin-bottom:15px;"><input type="radio" name="quiz-mode" value="m-to-s"> 名称 ➔ 記号</label>
-                <div style="display:flex; justify-content:center; gap:20px; margin-bottom:20px;">
-                    <label><input type="radio" name="order" value="rand"> ランダム</label>
-                    <label><input type="radio" name="order" value="seq" checked> 番号順</label>
-                </div>
-            </div>
-            <button class="btn" style="width:100%" onclick="startQuiz()">クイズ開始</button>
-        </div>
-    </div>
+    <div id="screen-setup" class="screen" style="justify-content: center; align-items: center;">
+        <div class="setup-card">
+            <h3 style="margin-top:0;">クイズ設定</h3>
+            <div id="quiz-range-text" class="range-display">1〜20</div>
+            <button class="btn-outline" style="margin-bottom:20px;" onclick="openSelector()">個別選択 / 範囲変更</button>
+            
+            <div style="text-align:left; display:inline-block; width:100%; border-top:1px solid #eee; padding-top:15px;">
+                <div style="font-size:0.75rem; color:#888; margin-bottom:10px;">出題モード:</div>
+                <label style="display:block; margin-bottom:10px;"><input type="radio" name="quiz-mode" value="s-to-m" checked> 記号 ➔ 名称</label>
+                <label style="display:block; margin-bottom:15px;"><input type="radio" name="quiz-mode" value="m-to-s"> 名称 ➔ 記号</label>
+                <div style="display:flex; justify-content:center; gap:20px; margin-bottom:20px;">
+                    <label><input type="radio" name="order" value="rand"> ランダム</label>
+                    <label><input type="radio" name="order" value="seq" checked> 番号順</label>
+                </div>
+            </div>
+            <button class="btn" style="width:100%" onclick="startQuiz()">クイズ開始</button>
+        </div>
+    </div>
 
-    <div id="screen-quiz" class="screen">
-        <div id="quiz-gesture-layer">
-            <div id="q-content" style="text-align:center; pointer-events:none;"></div>
-            <button id="btn-main" class="btn" style="margin-top:30px; min-width:160px;"></button>
-            <div style="margin-top:20px; font-size:0.7rem; color:#aaa;">[Enter/Space/→/タップ] 答え・次へ | [←] 戻る</div>
-        </div>
-    </div>
+    <div id="screen-quiz" class="screen">
+        <div id="quiz-gesture-layer">
+            <div id="q-content" style="text-align:center; pointer-events:none;"></div>
+            <button id="btn-main" class="btn" style="margin-top:30px; min-width:160px;"></button>
+            <div style="margin-top:20px; font-size:0.7rem; color:#aaa;">[Enter/Space/→/タップ] 答え・次へ | [←] 戻る</div>
+        </div>
+    </div>
 
-    <div id="selector-overlay">
-        <div style="color:white; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-size:0.9rem;">出題元素個別選択</span>
-            <button class="btn" onclick="closeSelector()">完了</button>
-        </div>
-        <div id="selector-container">
-            <div id="selector-grid" class="table-grid"></div>
-        </div>
-        <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="btn-outline" style="flex:1; background:#fff;" onclick="selectAll(true)">全選択</button>
-            <button class="btn-outline" style="flex:1; background:#fff;" onclick="selectAll(false)">解除</button>
-        </div>
-    </div>
+    <div id="selector-overlay">
+        <div style="color:white; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:0.9rem;">出題元素個別選択</span>
+            <button class="btn" onclick="closeSelector()">完了</button>
+        </div>
+        <div id="selector-container">
+            <div id="selector-grid" class="table-grid"></div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn-outline" style="flex:1; background:#fff;" onclick="selectAll(true)">全選択</button>
+            <button class="btn-outline" style="flex:1; background:#fff;" onclick="selectAll(false)">解除</button>
+        </div>
+    </div>
 
-    <div id="modal-overlay" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-nav" style="left:0;" onclick="moveElement(-1)">◀</div>
-            <div class="modal-nav" style="right:0;" onclick="moveElement(1)">▶</div>
-            <div id="modal-body"></div>
-            <button class="search-btn" onclick="event.stopPropagation(); searchElement()">🔍</button>
-        </div>
-    </div>
+    <div id="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-nav" style="left:0;" onclick="moveElement(-1)">◀</div>
+            <div class="modal-nav" style="right:0;" onclick="moveElement(1)">▶</div>
+            <div id="modal-body"></div>
+            <button class="search-btn" onclick="event.stopPropagation(); searchElement()">🔍</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    const d1 = [["H","水素","Hydrogen",1.008,1,1],["He","ヘリウム","Helium",4.0026,1,18],["Li","リチウム","Lithium",6.94,2,1],["Be","ベリリウム","Beryllium",9.0122,2,2],["B","ホウ素","Boron",10.81,2,13],["C","炭素","Carbon",12.011,2,14],["N","窒素","Nitrogen",14.007,2,15],["O","酸素","Oxygen",15.999,2,16],["F","フッ素","Fluorine",18.998,2,17],["Ne","ネオン","Neon",20.180,2,18],["Na","ナトリウム","Sodium",22.990,3,1],["Mg","マグネシウム","Magnesium",24.305,3,2],["Al","アルミニウム","Aluminium",26.982,3,13],["Si","ケイ素","Silicon",28.085,3,14],["P","リン","Phosphorus",30.974,3,15],["S","硫黄","Sulfur",32.06,3,16],["Cl","塩素","Chlorine",35.45,3,17],["Ar","アルゴン","Argon",39.948,3,18],["K","カリウム","Potassium",39.098,4,1],["Ca","カルシウム","Calcium",40.078,4,2],["Sc","スカンジウム","Scandium",44.956,4,3],["Ti","チタン","Titanium",47.867,4,4],["V","バナジウム","Vanadium",50.942,4,5],["Cr","クロム","Chromium",51.996,4,6],["Mn","マンガン","Manganese",54.938,4,7],["Fe","鉄","Iron",55.845,4,8],["Co","コバルト","Cobalt",58.933,4,9],["Ni","ニッケル","Nickel",58.693,4,10],["Cu","銅","Copper",63.546,4,11],["Zn","亜鉛","Zinc",65.38,4,12],["Ga","ガリウム","Gallium",69.723,4,13],["Ge","ゲルマニウム","Germanium",72.63,4,14],["As","ヒ素","Arsenic",74.922,4,15],["Se","セレン","Selenium",78.971,4,16],["Br","臭素","Bromine",79.904,4,17],["Kr","クリプトン","Krypton",83.798,4,18],["Rb","ルビジウム","Rubidium",85.468,5,1],["Sr","ストロンチウム","Strontium",87.62,5,2],["Y","イットリウム","Yttrium",88.906,5,3],["Zr","ジルコニウム","Zirconium",91.224,5,4],["Nb","ニオブ","Niobium",92.906,5,5],["Mo","モリブデン","Molybdenum",95.95,5,6],["Tc","テクネチウム","Technetium",98,5,7],["Ru","ルテニウム","Ruthenium",101.07,5,8],["Rh","ロジウム","Rhodium",102.91,5,9],["Pd","パラジウム","Palladium",106.42,5,10],["Ag","銀","Silver",107.87,5,11],["Cd","カドミウム","Cadmium",112.41,5,12],["In","インジウム","Indium",114.82,5,13],["Sn","スズ","Tin",118.71,5,14],["Sb","アンチモン","Antimony",121.76,5,15],["Te","テルル","Tellurium",127.6,5,16],["I","ヨウ素","Iodine",126.9,5,17],["Xe","キセノン","Xenon",131.29,5,18],["Cs","セシウム","Cesium",132.91,6,1],["Ba","バリウム","Barium",137.33,6,2],["La","ランタン","Lanthanum",138.91,9,4],["Ce","セリウム","Cerium",140.12,9,5],["Pr","プラセオジム","Praseodymium",140.91,9,6],["Nd","ネオジム","Neodymium",144.24,9,7]];
-    const d2 = [["Pm","プロメチウム","Promethium",145,9,8],["Sm","サマリウム","Samarium",150.36,9,9],["Eu","ユウロピウム","Europium",151.96,9,10],["Gd","ガドリニウム","Gadolinium",157.25,9,11],["Tb","テルビウム","Terbium",158.93,9,12],["Dy","ジスプロシウム","Dysprosium",162.50,9,13],["Ho","ホルミウム","Hoｌmium",164.93,9,14],["Er","エルビウム","Erbium",167.26,9,15],["Tm","ツリウム","Thulium",168.93,9,16],["Yb","イッテルビウム","Ytterbium",173.05,9,17],["Lu","ルテチウム","Lutetium",174.97,9,18],["Hf","ハフニウム","Hafnium",178.49,6,4],["Ta","タンタル","Tantalum",180.95,6,5],["W","タングステン","Tungsten",183.84,6,6],["Re","レニウム","Rhenium",186.21,6,7],["Os","オスミウム","Osmium",190.23,6,8],["Ir","イリジウム","Iridium",192.22,6,9],["Pt","白金","Platinum",195.08,6,10],["Au","金","Gold",196.97,6,11],["Hg","水銀","Mercury",200.59,6,12],["Tl","タリウム","Thallium",204.38,6,13],["Pb","鉛","Lead",207.2,6,14],["Bi","ビスマス","Bismuth",208.98,6,15],["Po","ポロニウム","Polonium",209,6,16],["At","アスタチン","Astatine",210,6,17],["Rn","ラドン","Radon",222,6,18],["Fr","フランシウム","Francium",223,7,1],["Ra","ラジウム","Radium",226,7,2],["Ac","アクチニウム","Actinium",227,10,4],["Th","トリウム","Thorium",232.04,10,5],["Pa","プロトアクチニウム","Protactinium",231.04,10,6],["U","ウラン","Uranium",238.03,10,7],["Np","ネプツニウム","Neptunium",237,10,8],["Pu","プルトニウム","Plutonium",244,10,9],["Am","アメリシウム","Americium",243,10,10],["Cm","キュリウム","Curium",247,10,11],["Bk","バークリウム","Berkelium",247,10,12],["Cf","カリホルニウム","Californium",251,10,13],["Es","アインスタイニウム","Einsteinium",252,10,14],["Fm","フェルミウム","Fermium",257,10,15],["Md","メンデレビウム","Mendelevium",258,10,16],["No","ノーベリウム","Nobelium",259,10,17],["Lr","ローレンシウム","Lawrencium",262,10,18],["Rf","ラザホージウム","Rutherfordium",267,7,4],["Db","ドブニウム","Dubnium",268,7,5],["Sg","シーボーギウム","Seaborgium",269,7,6],["Bh","ボーリウム","Bohrium",270,7,7],["Hs","ハッシウム","Hassium",269,7,8],["Mt","マイトネリウム","Meitnerium",278,7,9],["Ds","ダームスタチウム","Darmstadtium",281,7,10],["Rg","レントゲニウム","Roentgenium",282,7,11],["Cn","コペルニシウム","Copernicium",285,7,12],["Nh","ニホニウム","Nihonium",286,7,13],["Fl","フレロビウム","Flerovium",289,7,14],["Mc","モスコビウム","Moscovium",290,7,15],["Lv","リバモリウム","Livermorium",293,7,16],["Ts","テネシン","Tennessine",294,7,17],["Og","オガネソン","Oganesson",294,7,18]];
-    const elements = [...d1, ...d2].map((d, i) => ({ n: i+1, s: d[0], m: d[1], e: d[2], w: d[3], p: d[4], g: d[5] }));
+    const d1 = [["H","水素","Hydrogen",1.008,1,1],["He","ヘリウム","Helium",4.0026,1,18],["Li","リチウム","Lithium",6.94,2,1],["Be","ベリリウム","Beryllium",9.0122,2,2],["B","ホウ素","Boron",10.81,2,13],["C","炭素","Carbon",12.011,2,14],["N","窒素","Nitrogen",14.007,2,15],["O","酸素","Oxygen",15.999,2,16],["F","フッ素","Fluorine",18.998,2,17],["Ne","ネオン","Neon",20.180,2,18],["Na","ナトリウム","Sodium",22.990,3,1],["Mg","マグネシウム","Magnesium",24.305,3,2],["Al","アルミニウム","Aluminium",26.982,3,13],["Si","ケイ素","Silicon",28.085,3,14],["P","リン","Phosphorus",30.974,3,15],["S","硫黄","Sulfur",32.06,3,16],["Cl","塩素","Chlorine",35.45,3,17],["Ar","アルゴン","Argon",39.948,3,18],["K","カリウム","Potassium",39.098,4,1],["Ca","カルシウム","Calcium",40.078,4,2],["Sc","スカンジウム","Scandium",44.956,4,3],["Ti","チタン","Titanium",47.867,4,4],["V","バナジウム","Vanadium",50.942,4,5],["Cr","クロム","Chromium",51.996,4,6],["Mn","マンガン","Manganese",54.938,4,7],["Fe","鉄","Iron",55.845,4,8],["Co","コバルト","Cobalt",58.933,4,9],["Ni","ネッケル","Nickel",58.693,4,10],["Cu","銅","Copper",63.546,4,11],["Zn","亜鉛","Zinc",65.38,4,12],["Ga","ガリウム","Gallium",69.723,4,13],["Ge","ゲルマニウム","Germanium",72.63,4,14],["As","ヒ素","Arsenic",74.922,4,15],["Se","セレン","Selenium",78.971,4,16],["Br","臭素","Bromine",79.904,4,17],["Kr","クリプトン","Krypton",83.798,4,18],["Rb","ルビジウム","Rubidium",85.468,5,1],["Sr","ストロンチウム","Strontium",87.62,5,2],["Y","イットリウム","Yttrium",88.906,5,3],["Zr","ジルコニウム","Zirconium",91.224,5,4],["Nb","ニオブ","Niobium",92.906,5,5],["Mo","モリブデン","Molybdenum",95.95,5,6],["Tc","テクネチウム","Technetium",98,5,7],["Ru","ルテニウム","Ruthenium",101.07,5,8],["Rh","ロジウム","Rhodium",102.91,5,9],["Pd","パラジウム","Palladium",106.42,5,10],["Ag","銀","Silver",107.87,5,11],["Cd","カドミウム","Cadmium",112.41,5,12],["In","インジウム","Indium",114.82,5,13],["Sn","スズ","Tin",118.71,5,14],["Sb","アンチモン","Antimony",121.76,5,15],["Te","テルル","Tellurium",127.6,5,16],["I","ヨウ素","Iodine",126.9,5,17],["Xe","キセノン","Xenon",131.29,5,18],["Cs","セシウム","Cesium",132.91,6,1],["Ba","バリウム","Barium",137.33,6,2],["La","ランタン","Lanthanum",138.91,9,4],["Ce","セリウム","Cerium",140.12,9,5],["Pr","プラセオジム","Praseodymium",140.91,9,6],["Nd","ネオジム","Neodymium",144.24,9,7]];
+    const d2 = [["Pm","プロメチウム","Promethium",145,9,8],["Sm","サマリウム","Samarium",150.36,9,9],["Eu","ユウロピウム","Europium",151.96,9,10],["Gd","ガドリニウム","Gadolinium",157.25,9,11],["Tb","テルビウム","Terbium",158.93,9,12],["Dy","ジスプロシウム","Dysprosium",162.50,9,13],["Ho","ホルミウム","Hoｌmium",164.93,9,14],["Er","エルビウム","Erbium",167.26,9,15],["Tm","ツリウム","Thulium",168.93,9,16],["Yb","イッテルビウム","Ytterbium",173.05,9,17],["Lu","ルテチウム","Lutetium",174.97,9,18],["Hf","ハフニウム","Hafnium",178.49,6,4],["Ta","タンタル","Tantalum",180.95,6,5],["W","タングステン","Tungsten",183.84,6,6],["Re","レニウム","Rhenium",186.21,6,7],["Os","オスミウム","Osmium",190.23,6,8],["Ir","イリジウム","Iridium",192.22,6,9],["Pt","白金","Platinum",195.08,6,10],["Au","金","Gold",196.97,6,11],["Hg","水銀","Mercury",200.59,6,12],["Tl","タリウム","Thallium",204.38,6,13],["Pb","鉛","Lead",207.2,6,14],["Bi","ビスマス","Bismuth",208.98,6,15],["Po","ポロニウム","Polonium",209,6,16],["At","アスタチン","Astatine",210,6,17],["Rn","ラドン","Radon",222,6,18],["Fr","フランシウム","Francium",223,7,1],["Ra","ラジウム","Radium",226,7,2],["Ac","アクチニウム","Actinium",227,10,4],["Th","トリウム","Thorium",232.04,10,5],["Pa","プロトアクチニウム","Protactinium",231.04,10,6],["U","ウラン","Uranium",238.03,10,7],["Np","ネプツニウム","Neptunium",237,10,8],["Pu","プルトニウム","Plutonium",244,10,9],["Am","アメリシウム","Americium",243,10,10],["Cm","キュリウム","Curium",247,10,11],["Bk","バークリウム","Berkelium",247,10,12],["Cf","カリホルニウム","Californium",251,10,13],["Es","アインスタイニウム","Einsteinium",252,10,14],["Fm","フェルミウム","Fermium",257,10,15],["Md","メンデレビウム","Mendelevium",258,10,16],["No","ノーベリウム","Nobelium",259,10,17],["Lr","ローレンシウム","Lawrencium",262,10,18],["Rf","ラザホージウム","Rutherfordium",267,7,4],["Db","ドブニウム","Dubnium",268,7,5],["Sg","シーボーギウム","Seaborgium",269,7,6],["Bh","ボーリウム","Bohrium",270,7,7],["Hs","ハッシウム","Hassium",269,7,8],["Mt","マイトネリウム","Meitnerium",278,7,9],["Ds","ダームスタチウム","Darmstadtium",281,7,10],["Rg","レントゲニウム","Roentgenium",282,7,11],["Cn","コペルニシウム","Copernicium",285,7,12],["Nh","ニホニウム","Nihonium",286,7,13],["Fl","フレロビウム","Flerovium",289,7,14],["Mc","モスコビウム","Moscovium",290,7,15],["Lv","リバモリウム","Livermorium",293,7,16],["Ts","テネシン","Tennessine",294,7,17],["Og","オガネソン","Oganesson",294,7,18]];
+    const elements = [...d1, ...d2].map((d, i) => ({ n: i+1, s: d[0], m: d[1], e: d[2], w: d[3], p: d[4], g: d[5] }));
 
-    let selectedNumbers = new Set(Array.from({length: 20}, (_, i) => i + 1));
-    let quizPool = [], qIdx = 0, qRev = false, currentEl = null;
-    let isDragging = false, dragMode = true;
+    let selectedNumbers = new Set(Array.from({length: 20}, (_, i) => i + 1));
+    let quizPool = [], qIdx = 0, qRev = false, currentEl = null;
+    let isDragging = false, dragMode = true;
 
-    function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
-    function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); }
+    function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
+    function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); }
 
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(id === 'screen-setup') updateRangeDisplay();
-        if(id === 'screen-table') renderTable('table-grid', false);
-        if(document.getElementById('side-menu').classList.contains('open')) toggleMenu();
-    }
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'screen-setup') updateRangeDisplay();
+        if(id === 'screen-table') renderTable('table-grid', false);
+        if(document.getElementById('side-menu').classList.contains('open')) toggleMenu();
+    }
 
-    function renderTable(targetId, isSelector) {
-        const grid = document.getElementById(targetId); 
-        grid.innerHTML = "<div></div>"; 
-        for(let g=1; g<=18; g++) grid.appendChild(createLabel(g));
-        for(let r=1; r<=10; r++) {
-            if(r===8) { for(let i=0; i<19; i++) grid.appendChild(createSpacer()); continue; }
-            grid.appendChild(createLabel(r<=7?r:""));
-            for(let c=1; c<=18; c++) {
-                const el = elements.find(e=>e.p===r && e.g===c);
-                if(el) {
-                    const cell = document.createElement('div');
-                    const stCls = getStateName(el.n)==="気体"?"state-gas":(getStateName(el.n)==="液体"?"state-liquid":"state-solid");
-                    cell.className = `cell ${getGroupClass(el)} ${stCls} ${isRadio(el.n)?'is-radio':''} ${isSelector ? 'sel-cell' : ''}`;
-                    if(isSelector && selectedNumbers.has(el.n)) cell.classList.add('selected');
-                    cell.innerHTML = `<span>${el.n}</span><b>${el.s}</b>`;
-                    if(isSelector) {
-                        cell.dataset.n = el.n;
-                        cell.onmousedown = (e) => { isDragging = true; dragMode = !selectedNumbers.has(el.n); toggleElement(el.n); };
-                        cell.onmouseenter = () => { if(isDragging) toggleElement(el.n, dragMode); };
-                        cell.ontouchstart = (e) => { isDragging = true; dragMode = !selectedNumbers.has(el.n); toggleElement(el.n); e.preventDefault(); };
-                    } else { 
-                        cell.onclick = () => showDetail(el); 
-                    }
-                    grid.appendChild(cell);
-                } else grid.appendChild(createSpacer());
-            }
-        }
-        if(!isSelector) updateTableStyle();
-    }
+    function renderTable(targetId, isSelector) {
+        const grid = document.getElementById(targetId); 
+        grid.innerHTML = "<div></div>"; 
+        for(let g=1; g<=18; g++) grid.appendChild(createLabel(g));
+        for(let r=1; r<=10; r++) {
+            if(r===8) { for(let i=0; i<19; i++) grid.appendChild(createSpacer()); continue; }
+            grid.appendChild(createLabel(r<=7?r:""));
+            for(let c=1; c<=18; c++) {
+                const el = elements.find(e=>e.p===r && e.g===c);
+                if(el) {
+                    const cell = document.createElement('div');
+                    const stCls = getStateName(el.n)==="気体"?"state-gas":(getStateName(el.n)==="液体"?"state-liquid":"state-solid");
+                    cell.className = `cell ${getGroupClass(el)} ${stCls} ${isRadio(el.n)?'is-radio':''} ${isSelector ? 'sel-cell' : ''}`;
+                    if(isSelector && selectedNumbers.has(el.n)) cell.classList.add('selected');
+                    cell.innerHTML = `<span>${el.n}</span><b>${el.s}</b>`;
+                    if(isSelector) {
+                        cell.dataset.n = el.n;
+                        cell.onmousedown = (e) => { isDragging = true; dragMode = !selectedNumbers.has(el.n); toggleElement(el.n); };
+                        cell.onmouseenter = () => { if(isDragging) toggleElement(el.n, dragMode); };
+                        cell.ontouchstart = (e) => { isDragging = true; dragMode = !selectedNumbers.has(el.n); toggleElement(el.n); e.preventDefault(); };
+                    } else { 
+                        cell.onclick = () => showDetail(el); 
+                    }
+                    grid.appendChild(cell);
+                } else grid.appendChild(createSpacer());
+            }
+        }
+        if(!isSelector) updateTableStyle();
+    }
 
-    function createLabel(t) { const l=document.createElement('div'); l.className="guide-label"; l.innerText=t; return l; }
-    function createSpacer() { const s=document.createElement('div'); s.className="spacer"; return s; }
+    function createLabel(t) { const l=document.createElement('div'); l.className="guide-label"; l.innerText=t; return l; }
+    function createSpacer() { const s=document.createElement('div'); s.className="spacer"; return s; }
 
-    function getGroupName(el) {
-        const { n, g, p } = el;
-        if (p === 9) return "ランタノイド"; if (p === 10) return "アクチノイド";
-        if (g === 1 && n !== 1) return "アルカリ金属"; if (g === 2) return "アルカリ土類金属";
-        if (g === 17) return "ハロゲン"; if (g === 18) return "希ガス";
-        if (g >= 3 && g <= 12) return "遷移金属";
-        if ([1, 6, 7, 8, 15, 16, 34].includes(n)) return "非金属";
-        if ([5, 14, 32, 33, 51, 52, 84].includes(n)) return "半金属";
-        return "事後遷移金属";
-    }
-    const getStateName = (n) => [1,2,7,8,9,10,17,18,36,54,86,118].includes(n) ? "気体" : ([35,80].includes(n) ? "液体" : "固体");
-    const isRadio = (n) => (n === 43 || n === 61 || n >= 84);
-    function getGroupClass(el) {
-        const n=getGroupName(el);
-        const map={"ランタノイド":"lanthanoid","アクチノイド":"actinoid","アルカリ金属":"alkali-metal","アルカリ土類金属":"alkaline-earth","ハロゲン":"halogen","希ガス":"noble-gas","遷移金属":"transition-metal","非金属":"nonmetal","半金属":"metalloid"};
-        return map[n]||"basic-metal";
-    }
+    function getGroupName(el) {
+        const { n, g, p } = el;
+        if (p === 9) return "ランタノイド"; if (p === 10) return "アクチノイド";
+        if (g === 1 && n !== 1) return "アルカリ金属"; if (g === 2) return "アルカリ土類金属";
+        if (g === 17) return "ハロゲン"; if (g === 18) return "希ガス";
+        if (g >= 3 && g <= 12) return "遷移金属";
+        if ([1, 6, 7, 8, 15, 16, 34].includes(n)) return "非金属";
+        if ([5, 14, 32, 33, 51, 52, 84].includes(n)) return "半金属";
+        return "事後遷移金属";
+    }
+    const getStateName = (n) => [1,2,7,8,9,10,17,18,36,54,86,118].includes(n) ? "気体" : ([35,80].includes(n) ? "液体" : "固体");
+    const isRadio = (n) => (n === 43 || n === 61 || n >= 84);
+    function getGroupClass(el) {
+        const n=getGroupName(el);
+        const map={"ランタノイド":"lanthanoid","アクチノイド":"actinoid","アルカリ金属":"alkali-metal","アルカリ土類金属":"alkaline-earth","ハロゲン":"halogen","希ガス":"noble-gas","遷移金属":"transition-metal","非金属":"nonmetal","半金属":"metalloid"};
+        return map[n]||"basic-metal";
+    }
 
-    function updateTableStyle() {
-        const grid = document.getElementById('table-grid');
-        if(!grid) return;
-        const legendArea = document.getElementById('legend-area');
-        const isGroup = document.getElementById('check-group').checked;
-        const isStatus = document.getElementById('check-status').checked;
-        const isRadioCheck = document.getElementById('check-radio').checked;
+    function updateTableStyle() {
+        const grid = document.getElementById('table-grid');
+        if(!grid) return;
+        const legendArea = document.getElementById('legend-area');
+        const isGroup = document.getElementById('check-group').checked;
+        const isStatus = document.getElementById('check-status').checked;
+        const isRadioCheck = document.getElementById('check-radio').checked;
 
-        grid.classList.toggle('color-mode-group', isGroup);
-        grid.classList.toggle('show-status', isStatus);
-        grid.classList.toggle('show-radio', isRadioCheck);
+        grid.classList.toggle('color-mode-group', isGroup);
+        grid.classList.toggle('show-status', isStatus);
+        grid.classList.toggle('show-radio', isRadioCheck);
 
-        legendArea.innerHTML = '';
-        if (isGroup || isStatus || isRadioCheck) {
-            legendArea.style.display = 'flex';
-            if (isGroup) {
-                const groups = [
-                    {cls:"alkali-metal", txt:"アルカリ金属"}, {cls:"alkaline-earth", txt:"アルカリ土類金属"}, 
-                    {cls:"transition-metal", txt:"遷移金属"}, {cls:"basic-metal", txt:"事後遷移金属"}, 
-                    {cls:"metalloid", txt:"半金属"}, {cls:"nonmetal", txt:"非金属"}, 
-                    {cls:"halogen", txt:"ハロゲン"}, {cls:"noble-gas", txt:"希ガス"}
-                ];
-                groups.forEach(g => { legendArea.innerHTML += `<div class="legend-item"><div class="legend-box ${g.cls}"></div>${g.txt}</div>`; });
-            }
-            if (isStatus) {
-                legendArea.innerHTML += `<div class="legend-item" style="color:#ff3b30; font-weight:bold;">赤:気体</div>`;
-                legendArea.innerHTML += `<div class="legend-item" style="color:#007aff; font-weight:bold;">青:液体</div>`;
-                legendArea.innerHTML += `<div class="legend-item" style="color:#1d1d1f; font-weight:bold;">黒:固体</div>`;
-            }
-            if (isRadioCheck) {
-                legendArea.innerHTML += `<div class="legend-item"><span style="color:#ff3b30;">☢</span>:放射性</div>`;
-            }
-        } else { legendArea.style.display = 'none'; }
-    }
+        legendArea.innerHTML = '';
+        if (isGroup || isStatus || isRadioCheck) {
+            legendArea.style.display = 'flex';
+            if (isGroup) {
+                const groups = [
+                    {cls:"alkali-metal", txt:"アルカリ金属"}, {cls:"alkaline-earth", txt:"アルカリ土類金属"}, 
+                    {cls:"transition-metal", txt:"遷移金属"}, {cls:"basic-metal", txt:"事後遷移金属"}, 
+                    {cls:"metalloid", txt:"半金属"}, {cls:"nonmetal", txt:"非金属"}, 
+                    {cls:"halogen", txt:"ハロゲン"}, {cls:"noble-gas", txt:"希ガス"}
+                ];
+                groups.forEach(g => { legendArea.innerHTML += `<div class="legend-item"><div class="legend-box ${g.cls}"></div>${g.txt}</div>`; });
+            }
+            if (isStatus) {
+                legendArea.innerHTML += `<div class="legend-item" style="color:#ff3b30; font-weight:bold;">赤:気体</div>`;
+                legendArea.innerHTML += `<div class="legend-item" style="color:#007aff; font-weight:bold;">青:液体</div>`;
+                legendArea.innerHTML += `<div class="legend-item" style="color:#1d1d1f; font-weight:bold;">黒:固体</div>`;
+            }
+            if (isRadioCheck) {
+                legendArea.innerHTML += `<div class="legend-item"><span style="color:#ff3b30;">☢</span>:放射性</div>`;
+            }
+        } else { legendArea.style.display = 'none'; }
+    }
 
-    function openSelector() { document.getElementById('selector-overlay').style.display = 'flex'; renderTable('selector-grid', true); }
-    function closeSelector() { document.getElementById('selector-overlay').style.display = 'none'; updateRangeDisplay(); }
-    function toggleElement(n, force) {
-        n = parseInt(n);
-        if(force !== undefined) { force ? selectedNumbers.add(n) : selectedNumbers.delete(n); }
-        else { selectedNumbers.has(n) ? selectedNumbers.delete(n) : selectedNumbers.add(n); }
-        const cell = document.querySelector(`.sel-cell[data-n="${n}"]`);
-        if(cell) cell.classList.toggle('selected', selectedNumbers.has(n));
-    }
-    function selectAll(bool) {
-        elements.forEach(e => bool ? selectedNumbers.add(e.n) : selectedNumbers.delete(e.n));
-        document.querySelectorAll('.sel-cell').forEach(c => c.classList.toggle('selected', bool));
-    }
-    function updateRangeDisplay() {
-        const sorted = Array.from(selectedNumbers).sort((a,b) => a-b);
-        if(sorted.length === 0) { document.getElementById('quiz-range-text').innerText = "未選択"; return; }
-        let res = [], start = sorted[0], prev = sorted[0];
-        for(let i=1; i<=sorted.length; i++) {
-            if(i < sorted.length && sorted[i] === prev + 1) { prev = sorted[i]; }
-            else { res.push(start === prev ? start : `${start}〜${prev}`); if(i < sorted.length) { start = sorted[i]; prev = sorted[i]; } }
-        }
-        document.getElementById('quiz-range-text').innerText = res.join(', ');
-    }
+    function openSelector() { document.getElementById('selector-overlay').style.display = 'flex'; renderTable('selector-grid', true); }
+    function closeSelector() { document.getElementById('selector-overlay').style.display = 'none'; updateRangeDisplay(); }
+    function toggleElement(n, force) {
+        n = parseInt(n);
+        if(force !== undefined) { force ? selectedNumbers.add(n) : selectedNumbers.delete(n); }
+        else { selectedNumbers.has(n) ? selectedNumbers.delete(n) : selectedNumbers.add(n); }
+        const cell = document.querySelector(`.sel-cell[data-n="${n}"]`);
+        if(cell) cell.classList.toggle('selected', selectedNumbers.has(n));
+    }
+    function selectAll(bool) {
+        elements.forEach(e => bool ? selectedNumbers.add(e.n) : selectedNumbers.delete(e.n));
+        document.querySelectorAll('.sel-cell').forEach(c => c.classList.toggle('selected', bool));
+    }
+    function updateRangeDisplay() {
+        const sorted = Array.from(selectedNumbers).sort((a,b) => a-b);
+        if(sorted.length === 0) { document.getElementById('quiz-range-text').innerText = "未選択"; return; }
+        let res = [], start = sorted[0], prev = sorted[0];
+        for(let i=1; i<=sorted.length; i++) {
+            if(i < sorted.length && sorted[i] === prev + 1) { prev = sorted[i]; }
+            else { res.push(start === prev ? start : `${start}〜${prev}`); if(i < sorted.length) { start = sorted[i]; prev = sorted[i]; } }
+        }
+        document.getElementById('quiz-range-text').innerText = res.join(', ');
+    }
 
-    function startQuiz() {
-        quizPool = elements.filter(e => selectedNumbers.has(e.n));
-        if(!quizPool.length) return alert("元素を選択してください");
-        if(document.querySelector('input[name="order"]:checked').value === 'rand') quizPool.sort(()=>Math.random()-0.5);
-        else quizPool.sort((a,b)=>a.n - b.n);
-        qIdx = 0; showScreen('screen-quiz'); nextQuestion();
-    }
-    function nextQuestion() {
-        qRev = false; const el = quizPool[qIdx];
-        const mode = document.querySelector('input[name="quiz-mode"]:checked').value;
-        const qText = mode === "s-to-m" ? el.s : el.m;
-        const aText = mode === "s-to-m" ? el.m : el.s;
-        document.getElementById('btn-main').innerText = "答えを表示";
-        document.getElementById('q-content').innerHTML = `
-            <div style="color:#888; font-size:0.9rem;">Q ${qIdx+1} / ${quizPool.length}</div>
-            <div style="font-size:5rem; font-weight:bold; margin:20px 0;">${qText}</div>
-            <div id="q-ans" style="visibility:hidden;">
-                <div style="font-size:2.8rem; font-weight:bold;">${aText}</div>
-                <div style="font-size:1.3rem; color:var(--accent); margin-top:5px;">原子番号: ${el.n}</div>
-            </div>
-        `;
-    }
+    document.addEventListener('touchmove', (e) => {
+        if(isDragging) {
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if(target && target.closest('.sel-cell')) toggleElement(target.closest('.sel-cell').dataset.n, dragMode);
+            e.preventDefault();
+        }
+    }, {passive: false});
+    document.addEventListener('mouseup', () => isDragging = false);
+    document.addEventListener('touchend', () => isDragging = false);
 
-    function handleMainAction() {
-        if(!qRev) { document.getElementById('q-ans').style.visibility = 'visible'; document.getElementById('btn-main').innerText = "次へ"; qRev = true; }
-        else { qIdx++; if(qIdx >= quizPool.length) showScreen('screen-setup'); else nextQuestion(); }
-    }
-    function prevQuestion() { if(qIdx > 0) { qIdx--; nextQuestion(); } else { showScreen('screen-setup'); } }
+    function startQuiz() {
+        quizPool = elements.filter(e => selectedNumbers.has(e.n));
+        if(!quizPool.length) return alert("元素を選択してください");
+        if(document.querySelector('input[name="order"]:checked').value === 'rand') quizPool.sort(()=>Math.random()-0.5);
+        else quizPool.sort((a,b)=>a.n - b.n);
+        qIdx = 0; showScreen('screen-quiz'); nextQuestion();
+    }
+    function nextQuestion() {
+        qRev = false; const el = quizPool[qIdx];
+        const mode = document.querySelector('input[name="quiz-mode"]:checked').value;
+        const qText = mode === "s-to-m" ? el.s : el.m;
+        const aText = mode === "s-to-m" ? el.m : el.s;
+        document.getElementById('btn-main').innerText = "答えを表示";
+        document.getElementById('q-content').innerHTML = `
+            <div style="color:#888; font-size:0.9rem;">Q ${qIdx+1} / ${quizPool.length}</div>
+            <div style="font-size:5rem; font-weight:bold; margin:20px 0;">${qText}</div>
+            <div id="q-ans" style="visibility:hidden;">
+                <div style="font-size:2.8rem; font-weight:bold;">${aText}</div>
+                <div style="font-size:1.3rem; color:var(--accent); margin-top:5px;">原子番号: ${el.n}</div>
+            </div>
+        `;
+    }
 
-    function showDetail(el) {
-        currentEl = el;
-        document.getElementById('modal-body').innerHTML = `
-            <div style="font-size:0.8rem; color:#888;">No. ${el.n}</div>
-            <div style="font-size:4.5rem; font-weight:bold;">${el.s}</div>
-            <div style="font-size:1.8rem;">${el.m}</div>
-            <div style="margin-top:15px; font-size:0.9rem; text-align:left; background:#f2f2f7; padding:15px; border-radius:12px;">
-                <div>🧬 系統: ${getGroupName(el)}</div>
-                <div>🌡️ 常温での状態: ${getStateName(el.n)}</div>
-                <div>⚖️ 原子量: ${el.w}</div>
-            </div>
-        `;
-        document.getElementById('modal-overlay').style.display = 'flex';
-    }
-    
-    function searchElement() {
-        if (currentEl) {
-            const query = `${currentEl.m}+元素`;
-            window.open(`https://www.google.com/search?q=${query}`, '_blank');
-        }
-    }
+    function handleMainAction() {
+        if(!qRev) { document.getElementById('q-ans').style.visibility = 'visible'; document.getElementById('btn-main').innerText = "次へ"; qRev = true; }
+        else { qIdx++; if(qIdx >= quizPool.length) showScreen('screen-setup'); else nextQuestion(); }
+    }
+    function prevQuestion() { if(qIdx > 0) { qIdx--; nextQuestion(); } else { showScreen('screen-setup'); } }
 
-    function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
-    function moveElement(dir) { if(currentEl) { const next = elements.find(e=>e.n===currentEl.n+dir); if(next) showDetail(next); } }
+    document.getElementById('quiz-gesture-layer').onclick = (e) => { if(e.target.tagName !== 'BUTTON') handleMainAction(); };
+    document.getElementById('btn-main').onclick = handleMainAction;
 
-    showScreen('screen-home');
+    let qStartX = 0;
+    document.getElementById('screen-quiz').addEventListener('touchstart', (e) => { qStartX = e.changedTouches[0].screenX; }, {passive: true});
+    document.getElementById('screen-quiz').addEventListener('touchend', (e) => {
+        const diff = e.changedTouches[0].screenX - qStartX;
+        if(Math.abs(diff) > 60) { if(diff < 0) handleMainAction(); else prevQuestion(); }
+    }, {passive: true});
+
+    window.addEventListener('keydown', (e) => {
+        if(document.getElementById('screen-quiz').classList.contains('active')) {
+            if(e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); handleMainAction(); }
+            if(e.key === 'ArrowLeft') { e.preventDefault(); prevQuestion(); }
+        }
+        if(document.getElementById('modal-overlay').style.display === 'flex') {
+            if(e.key === 'ArrowRight') moveElement(1);
+            if(e.key === 'ArrowLeft') moveElement(-1);
+            if(e.key === 'Escape') closeModal();
+        }
+    });
+
+    function showDetail(el) {
+        currentEl = el;
+        document.getElementById('modal-body').innerHTML = `
+            <div style="font-size:0.8rem; color:#888;">No. ${el.n}</div>
+            <div style="font-size:4.5rem; font-weight:bold;">${el.s}</div>
+            <div style="font-size:1.8rem;">${el.m}</div>
+            <div style="margin-top:15px; font-size:0.9rem; text-align:left; background:#f2f2f7; padding:15px; border-radius:12px;">
+                <div>🧬 系統: ${getGroupName(el)}</div>
+                <div>🌡️ 常温での状態: ${getStateName(el.n)}</div>
+                <div>⚖️ 原子量: ${el.w}</div>
+            </div>
+        `;
+        document.getElementById('modal-overlay').style.display = 'flex';
+    }
+    
+    function searchElement() {
+        if (currentEl) {
+            const query = `${currentEl.m}+元素`;
+            window.open(`https://www.google.com/search?q=${query}`, '_blank');
+        }
+    }
+
+    function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+    function moveElement(dir) { if(currentEl) { const next = elements.find(e=>e.n===currentEl.n+dir); if(next) showDetail(next); } }
+
+    showScreen('screen-home');
 </script>
 </body>
 </html>
