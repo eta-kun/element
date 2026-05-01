@@ -63,6 +63,8 @@
         .noble-gas { background: #ffb6c1 !important; }
         .lanthanoid { background: #ffccff !important; }
         .actinoid { background: #ff99cc !important; }
+	.state-unknown b { color: #8e8e93 !important; }
+	.unknown-element { background: #e5e5ea !important; }
 
         #table-grid:not(.color-mode-group) .cell { background: #fff !important; }
         .show-status .state-gas b { color: #ff3b30 !important; }
@@ -229,11 +231,19 @@
             if(r===8) { for(let i=0; i<19; i++) grid.appendChild(createSpacer()); continue; }
             grid.appendChild(createLabel(r<=7?r:""));
             for(let c=1; c<=18; c++) {
-                const el = elements.find(e=>e.p===r && e.g===c);
-                if(el) {
-                    const cell = document.createElement('div');
-                    const stCls = getStateName(el.n)==="気体"?"state-gas":(getStateName(el.n)==="液体"?"state-liquid":"state-solid");
-                    cell.className = `cell ${getGroupClass(el)} ${stCls} ${isRadio(el.n)?'is-radio':''} ${isSelector ? 'sel-cell' : ''}`;
+            const el = elements.find(e=>e.p===r && e.g===c);
+            if(el) {
+                const cell = document.createElement('div');
+                
+                const state = getStateName(el.n);
+                const stCls = state === "気体" ? "state-gas" : 
+                             (state === "液体" ? "state-liquid" : 
+                             (state === "不明" ? "state-unknown" : "state-solid"));
+                
+                const gName = getGroupName(el);
+                const gCls = gName === "不明" ? "unknown-element" : getGroupClass(el);
+
+                cell.className = `cell ${gCls} ${stCls} ${isRadio(el.n)?'is-radio':''} ${isSelector ? 'sel-cell' : ''}`;
                     if(isSelector && selectedNumbers.has(el.n)) cell.classList.add('selected');
                     cell.innerHTML = `<span>${el.n}</span><b>${el.s}</b>`;
                     if(isSelector) {
@@ -254,17 +264,31 @@
     function createLabel(t) { const l=document.createElement('div'); l.className="guide-label"; l.innerText=t; return l; }
     function createSpacer() { const s=document.createElement('div'); s.className="spacer"; return s; }
 
-    function getGroupName(el) {
-        const { n, g, p } = el;
-        if (p === 9) return "ランタノイド"; if (p === 10) return "アクチノイド";
-        if (g === 1 && n !== 1) return "アルカリ金属"; if (g === 2) return "アルカリ土類金属";
-        if (g === 17) return "ハロゲン"; if (g === 18) return "希ガス";
-        if (g >= 3 && g <= 12) return "遷移金属";
-        if ([1, 6, 7, 8, 15, 16, 34].includes(n)) return "非金属";
-        if ([5, 14, 32, 33, 51, 52, 84].includes(n)) return "半金属";
-        return "事後遷移金属";
-    }
-    const getStateName = (n) => [1,2,7,8,9,10,17,18,36,54,86,118].includes(n) ? "気体" : ([35,80].includes(n) ? "液体" : "固体");
+function getGroupName(el) {
+    const { n, g, p } = el;
+    // 超重元素（104番以降）は化学的性質が未確定なため「不明」とする
+    if (n >= 104) return "不明"; 
+
+    if (p === 9) return "ランタノイド";
+    if (p === 10) return "アクチノイド";
+    if (g === 1 && n !== 1) return "アルカリ金属";
+    if (g === 2) return "アルカリ土類金属";
+    if (g === 17) return "ハロゲン";
+    if (g === 18) return "希ガス";
+    if (g >= 3 && g <= 12) return "遷移金属";
+    if ([1, 6, 7, 8, 15, 16, 34].includes(n)) return "非金属";
+    if ([5, 14, 32, 33, 51, 52, 84].includes(n)) return "半金属";
+    return "事後遷移金属";
+}
+    const getStateName = (n) => {
+    // 104番（Rf）以降はほとんどが合成元素で、常温での状態が実証されていないため「不明」とする
+    if (n >= 104) return "不明"; 
+    const gases = [1, 2, 7, 8, 9, 10, 17, 18, 36, 54, 86];
+    const liquids = [35, 80];
+    if (gases.includes(n)) return "気体";
+    if (liquids.includes(n)) return "液体";
+    return "固体";
+};
     const isRadio = (n) => (n === 43 || n === 61 || n >= 84);
     function getGroupClass(el) {
         const n=getGroupName(el);
@@ -272,40 +296,53 @@
         return map[n]||"basic-metal";
     }
 
-    function updateTableStyle() {
-        const grid = document.getElementById('table-grid');
-        if(!grid) return;
-        const legendArea = document.getElementById('legend-area');
-        const isGroup = document.getElementById('check-group').checked;
-        const isStatus = document.getElementById('check-status').checked;
-        const isRadioCheck = document.getElementById('check-radio').checked;
+   function updateTableStyle() {
+    const grid = document.getElementById('table-grid');
+    if(!grid) return;
+    const legendArea = document.getElementById('legend-area');
+    const isGroup = document.getElementById('check-group').checked;
+    const isStatus = document.getElementById('check-status').checked;
+    const isRadioCheck = document.getElementById('check-radio').checked;
 
-        grid.classList.toggle('color-mode-group', isGroup);
-        grid.classList.toggle('show-status', isStatus);
-        grid.classList.toggle('show-radio', isRadioCheck);
+    grid.classList.toggle('color-mode-group', isGroup);
+    grid.classList.toggle('show-status', isStatus);
+    grid.classList.toggle('show-radio', isRadioCheck);
 
-        legendArea.innerHTML = '';
-        if (isGroup || isStatus || isRadioCheck) {
-            legendArea.style.display = 'flex';
-            if (isGroup) {
-                const groups = [
-                    {cls:"alkali-metal", txt:"アルカリ金属"}, {cls:"alkaline-earth", txt:"アルカリ土類金属"}, 
-                    {cls:"transition-metal", txt:"遷移金属"}, {cls:"basic-metal", txt:"事後遷移金属"}, 
-                    {cls:"metalloid", txt:"半金属"}, {cls:"nonmetal", txt:"非金属"}, 
-                    {cls:"halogen", txt:"ハロゲン"}, {cls:"noble-gas", txt:"希ガス"}
-                ];
-                groups.forEach(g => { legendArea.innerHTML += `<div class="legend-item"><div class="legend-box ${g.cls}"></div>${g.txt}</div>`; });
-            }
-            if (isStatus) {
-                legendArea.innerHTML += `<div class="legend-item" style="color:#ff3b30; font-weight:bold;">赤:気体</div>`;
-                legendArea.innerHTML += `<div class="legend-item" style="color:#007aff; font-weight:bold;">青:液体</div>`;
-                legendArea.innerHTML += `<div class="legend-item" style="color:#1d1d1f; font-weight:bold;">黒:固体</div>`;
-            }
-            if (isRadioCheck) {
-                legendArea.innerHTML += `<div class="legend-item"><span style="color:#ff3b30;">☢</span>:放射性</div>`;
-            }
-        } else { legendArea.style.display = 'none'; }
+    legendArea.innerHTML = '';
+    if (isGroup || isStatus || isRadioCheck) {
+        legendArea.style.display = 'flex';
+        
+        // 系統色の凡例
+        if (isGroup) {
+            const groups = [
+                {cls:"alkali-metal", txt:"アルカリ金属"}, {cls:"alkaline-earth", txt:"アルカリ土類金属"}, 
+                {cls:"transition-metal", txt:"遷移金属"}, {cls:"basic-metal", txt:"事後遷移金属"}, 
+                {cls:"metalloid", txt:"半金属"}, {cls:"nonmetal", txt:"非金属"}, 
+                {cls:"halogen", txt:"ハロゲン"}, {cls:"noble-gas", txt:"希ガス"},
+                {cls:"lanthanoid", txt:"ランタノイド"}, {cls:"actinoid", txt:"アクチノイド"},
+                {cls:"unknown-element", txt:"不明"} // ←追加
+            ];
+            groups.forEach(g => { 
+                legendArea.innerHTML += `<div class="legend-item"><div class="legend-box ${g.cls}"></div>${g.txt}</div>`; 
+            });
+        }
+        
+        // 状態の凡例
+        if (isStatus) {
+            legendArea.innerHTML += `<div class="legend-item" style="color:#ff3b30; font-weight:bold;">赤:気体</div>`;
+            legendArea.innerHTML += `<div class="legend-item" style="color:#007aff; font-weight:bold;">青:液体</div>`;
+            legendArea.innerHTML += `<div class="legend-item" style="color:#1d1d1f; font-weight:bold;">黒:固体</div>`;
+            legendArea.innerHTML += `<div class="legend-item" style="color:#8e8e93; font-weight:bold;">灰:不明</div>`; // ←追加
+        }
+        
+        // 放射性の凡例
+        if (isRadioCheck) {
+            legendArea.innerHTML += `<div class="legend-item"><span style="color:#ff3b30;">☢</span>:放射性</div>`;
+        }
+    } else { 
+        legendArea.style.display = 'none'; 
     }
+}
 
     function openSelector() { document.getElementById('selector-overlay').style.display = 'flex'; renderTable('selector-grid', true); }
     function closeSelector() { document.getElementById('selector-overlay').style.display = 'none'; updateRangeDisplay(); }
