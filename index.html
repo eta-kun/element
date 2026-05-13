@@ -63,7 +63,7 @@
         .noble-gas { background: #ffb6c1 !important; }
         .lanthanoid { background: #ffccff !important; }
         .actinoid { background: #ff99cc !important; }
-	.state-unknown b { color: #8e8e93 !important; }
+	.show-status .state-unknown b { color: #8e8e93 !important; }
 	.unknown-element { background: #e5e5ea !important; }
 
         #table-grid:not(.color-mode-group) .cell { background: #fff !important; }
@@ -235,10 +235,12 @@
             if(el) {
                 const cell = document.createElement('div');
                 
-                const state = getStateName(el.n);
-                const stCls = state === "気体" ? "state-gas" : 
-                             (state === "液体" ? "state-liquid" : 
-                             (state === "不明" ? "state-unknown" : "state-solid"));
+               const state = getStateName(el.n);
+let stCls = "";
+if (state === "気体") stCls = "state-gas";
+else if (state === "液体") stCls = "state-liquid";
+else if (state === "不明") stCls = "state-unknown"; // ここでクラスは付与しておく
+else stCls = "state-solid";
                 
                 const gName = getGroupName(el);
                 const gCls = gName === "不明" ? "unknown-element" : getGroupClass(el);
