@@ -38,7 +38,6 @@
         .active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 周期表グリッド */
         .table-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 5px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .table-grid { 
             display: grid; grid-template-columns: 20px repeat(18, 1fr); 
@@ -52,7 +51,6 @@
         .guide-label { display: flex; justify-content: center; align-items: center; font-size: 0.5rem; color: var(--guide-text); pointer-events: none; }
         .spacer { border: none; background: transparent; pointer-events: none; }
 
-        /* 色分け設定 */
         .alkali-metal { background: #ff6666 !important; }
         .alkaline-earth { background: #ffdead !important; }
         .transition-metal { background: #add8e6 !important; }
@@ -71,19 +69,16 @@
         .show-status .state-liquid b { color: #007aff !important; }
         .show-radio .is-radio::after { content: "☢"; position: absolute; bottom: 0; left: 1px; color: #ff3b30; font-size: 0.5rem; }
 
-        /* セレクター画面 */
         #selector-grid .cell { background: #fff !important; color: #1d1d1f !important; border: 1px solid #d2d2d7; }
         #selector-grid .cell b { color: inherit !important; }
         #selector-grid .cell::after { content: none !important; }
         #selector-grid .cell.selected { background: var(--accent) !important; color: #fff !important; border-color: var(--accent); }
         #selector-grid .cell.selected span { color: #fff !important; }
 
-        /* 凡例エリア */
         #legend-area { display: none; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 10px; background: #fff; border-top: 1px solid var(--border); font-size: 0.7rem; flex-shrink: 0; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-box { width: 14px; height: 14px; border: 1px solid #ccc; border-radius: 2px; }
 
-        /* ホーム画面のボタンレイアウト */
         .home-menu { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
         .btn-large { background: var(--accent); color: white; border: none; padding: 20px; border-radius: 16px; cursor: pointer; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,113,227,0.2); }
         .btn-large:active { transform: scale(0.98); }
@@ -99,7 +94,6 @@
         .modal-nav { position: absolute; top: 0; width: 50px; height: 100%; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 1.5rem; cursor: pointer; z-index: 10; opacity: 0.5; transition: opacity 0.2s; }
         .modal-nav:active { color: var(--accent); opacity: 1; }
 
-        /* 虫眼鏡ボタン用スタイル (修正) */
         .search-btn { position: absolute; right: 15px; bottom: 15px; background: #f2f2f7; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 50; }
         .search-btn:active { transform: scale(0.9); background: #e5e5ea; }
 
@@ -239,7 +233,7 @@
 let stCls = "";
 if (state === "気体") stCls = "state-gas";
 else if (state === "液体") stCls = "state-liquid";
-else if (state === "不明") stCls = "state-unknown"; // ここでクラスは付与しておく
+else if (state === "不明") stCls = "state-unknown";
 else stCls = "state-solid";
                 
                 const gName = getGroupName(el);
@@ -268,7 +262,6 @@ else stCls = "state-solid";
 
 function getGroupName(el) {
     const { n, g, p } = el;
-    // 超重元素（104番以降）は化学的性質が未確定なため「不明」とする
     if (n >= 104) return "不明"; 
 
     if (p === 9) return "ランタノイド";
@@ -283,7 +276,6 @@ function getGroupName(el) {
     return "事後遷移金属";
 }
     const getStateName = (n) => {
-    // 104番（Rf）以降はほとんどが合成元素で、常温での状態が実証されていないため「不明」とする
     if (n >= 104) return "不明"; 
     const gases = [1, 2, 7, 8, 9, 10, 17, 18, 36, 54, 86];
     const liquids = [35, 80];
@@ -314,7 +306,6 @@ function getGroupName(el) {
     if (isGroup || isStatus || isRadioCheck) {
         legendArea.style.display = 'flex';
         
-        // 系統色の凡例
         if (isGroup) {
             const groups = [
                 {cls:"alkali-metal", txt:"アルカリ金属"}, {cls:"alkaline-earth", txt:"アルカリ土類金属"}, 
@@ -329,7 +320,6 @@ function getGroupName(el) {
             });
         }
         
-        // 状態の凡例
         if (isStatus) {
             legendArea.innerHTML += `<div class="legend-item" style="color:#ff3b30; font-weight:bold;">赤:気体</div>`;
             legendArea.innerHTML += `<div class="legend-item" style="color:#007aff; font-weight:bold;">青:液体</div>`;
@@ -337,7 +327,6 @@ function getGroupName(el) {
             legendArea.innerHTML += `<div class="legend-item" style="color:#8e8e93; font-weight:bold;">灰:不明</div>`; // ←追加
         }
         
-        // 放射性の凡例
         if (isRadioCheck) {
             legendArea.innerHTML += `<div class="legend-item"><span style="color:#ff3b30;">☢</span>:放射性</div>`;
         }
