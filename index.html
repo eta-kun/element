@@ -114,7 +114,7 @@
         <div style="text-align:right; cursor:pointer; padding-bottom:20px; font-size:1.5rem;" onclick="toggleMenu()">✕</div>
         <div class="menu-item" onclick="showScreen('screen-home')">🏠 ホーム</div>
         <div class="menu-item" onclick="showScreen('screen-table')">🧬 周期表</div>
-        <div class="menu-item" onclick="showScreen('screen-setup')">📝 クイズ設定</div>
+        <div class="menu-item" onclick="showScreen('screen-setup')">📝 クイズ</div>
     </div>
 
     <div id="screen-home" class="screen active" style="justify-content: center; align-items: center;">
@@ -148,7 +148,7 @@
 
     <div id="screen-setup" class="screen" style="justify-content: center; align-items: center;">
         <div class="setup-card">
-            <h3 style="margin-top:0;">クイズ設定</h3>
+            <h3 style="margin-top:0;">クイズ</h3>
             <div id="quiz-range-text" class="range-display">1〜20</div>
             <button class="btn-outline" style="margin-bottom:20px;" onclick="openSelector()">個別選択 / 範囲変更</button>
             
@@ -161,7 +161,7 @@
                     <label><input type="radio" name="order" value="seq" checked> 番号順</label>
                 </div>
             </div>
-            <button class="btn" style="width:100%" onclick="startQuiz()">クイズ開始</button>
+            <button class="btn" style="width:100%" onclick="startQuiz()">クイズ開始！</button>
         </div>
     </div>
 
@@ -313,7 +313,7 @@ function getGroupName(el) {
                 {cls:"metalloid", txt:"半金属"}, {cls:"nonmetal", txt:"非金属"}, 
                 {cls:"halogen", txt:"ハロゲン"}, {cls:"noble-gas", txt:"希ガス"},
                 {cls:"lanthanoid", txt:"ランタノイド"}, {cls:"actinoid", txt:"アクチノイド"},
-                {cls:"unknown-element", txt:"不明"} // ←追加
+                {cls:"unknown-element", txt:"不明"} 
             ];
             groups.forEach(g => { 
                 legendArea.innerHTML += `<div class="legend-item"><div class="legend-box ${g.cls}"></div>${g.txt}</div>`; 
@@ -324,7 +324,7 @@ function getGroupName(el) {
             legendArea.innerHTML += `<div class="legend-item" style="color:#ff3b30; font-weight:bold;">赤:気体</div>`;
             legendArea.innerHTML += `<div class="legend-item" style="color:#007aff; font-weight:bold;">青:液体</div>`;
             legendArea.innerHTML += `<div class="legend-item" style="color:#1d1d1f; font-weight:bold;">黒:固体</div>`;
-            legendArea.innerHTML += `<div class="legend-item" style="color:#8e8e93; font-weight:bold;">灰:不明</div>`; // ←追加
+            legendArea.innerHTML += `<div class="legend-item" style="color:#8e8e93; font-weight:bold;">灰:不明</div>`; 
         }
         
         if (isRadioCheck) {
